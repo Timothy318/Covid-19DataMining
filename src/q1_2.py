@@ -26,6 +26,8 @@ def process_age(x):
         
         parse_age = [int(i.strip()) for i in parse_age]
         if len(parse_age) > 1:
+            if parse_age[1] - parse_age[0] > 40:
+                return 10000
             return sum(parse_age)/len(parse_age)
         else:
             if parse_age[0] > 18:
@@ -145,7 +147,8 @@ cases_train['age'] = cases_train['age'].apply(process_age)
 cases_train['age'] = cases_train['age'].astype(float)
 cases_train['age'] = round(cases_train['age'],1)
 cases_train.loc[(cases_train.age < 1) & (cases_train.age >0),'age'] = 0
-
+index = cases_train.loc[(cases_train.age == 10000),'age'].index
+cases_train.drop(index,inplace=True)
 
 cases_train = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_train,process_mode)
 cases_train = impute(['longitude','latitude','date_confirmation'],'age',cases_train,process_mode)
@@ -203,7 +206,8 @@ cases_test['age'] = cases_test['age'].apply(process_age)
 cases_test['age'] = cases_test['age'].astype(float)
 cases_test['age'] = round(cases_test['age'],1)
 cases_test.loc[(cases_test.age < 1) & (cases_test.age >0),'age'] = 0
-
+index = cases_test.loc[(cases_test.age == 10000),'age'].index
+cases_test.drop(index,inplace=True)
 
 cases_test = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_test,process_mode)
 cases_test = impute(['longitude','latitude','date_confirmation'],'age',cases_test,process_mode)
