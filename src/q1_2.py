@@ -11,7 +11,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 import reverse_geocoder as rg
 
-def process_age(x):
+def process_age(x,dataset):
     if "-" in x:
         parse_age = x.split("-")
         parse_age = list(filter(None, parse_age))
@@ -26,7 +26,7 @@ def process_age(x):
         
         parse_age = [int(i.strip()) for i in parse_age]
         if len(parse_age) > 1:
-            if parse_age[1] - parse_age[0] > 40:
+            if parse_age[1] - parse_age[0] > 40 and dataset == 'train':
                 return 10000
             return sum(parse_age)/len(parse_age)
         else:
@@ -143,7 +143,7 @@ cases_train.dropna(subset=['sex', 'age','province'], how='all',inplace=True)
 # Impute age
 cases_train['age'] = cases_train['age'].fillna(value='')
 cases_train['age_range_ind'] = cases_train['age'].apply(age_range_dummy)
-cases_train['age'] = cases_train['age'].apply(process_age)
+cases_train['age'] = cases_train['age'].apply(process_age,dataset = 'train')
 cases_train['age'] = cases_train['age'].astype(float)
 cases_train['age'] = round(cases_train['age'],1)
 cases_train.loc[(cases_train.age < 1) & (cases_train.age >0),'age'] = 0
@@ -202,12 +202,10 @@ cases_train.loc[(cases_train.sex.isnull()),'sex'] = 'Not Available'
 # Impute age
 cases_test['age'] = cases_test['age'].fillna(value='')
 cases_test['age_range_ind'] = cases_test['age'].apply(age_range_dummy)
-cases_test['age'] = cases_test['age'].apply(process_age)
+cases_test['age'] = cases_test['age'].apply(process_age,dataset='test')
 cases_test['age'] = cases_test['age'].astype(float)
 cases_test['age'] = round(cases_test['age'],1)
 cases_test.loc[(cases_test.age < 1) & (cases_test.age >0),'age'] = 0
-index = cases_test.loc[(cases_test.age == 10000),'age'].index
-cases_test.drop(index,inplace=True)
 
 cases_test = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_test,process_mode)
 cases_test = impute(['longitude','latitude','date_confirmation'],'age',cases_test,process_mode)

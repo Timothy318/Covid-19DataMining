@@ -13,28 +13,58 @@ from sklearn.ensemble import IsolationForest
 
 
 cases_train = pd.read_csv('../results/cases_train_preprocessed.csv')
-# cases_train = pd.read_csv('../data/cases_train.csv')
-x = cases_train[['longitude','latitude']]
-plt.scatter(cases_train['longitude'], cases_train['latitude'],s=1)
-plt.show()
+print(cases_train.age.describe())
+freq_age = cases_train['age'].value_counts().to_frame()
+freq_age.reset_index(inplace=True)
+
+freq_sex = cases_train['sex'].value_counts().to_frame()
+freq_sex.reset_index(inplace=True)
+
+# plt.scatter(cases_train['longitude'], cases_train['latitude'],s=1)
+# plt.show()
+
+
+# model=IsolationForest(n_estimators=150, max_samples='auto', contamination=float(0.0002),max_features=2)
+# model.fit(x)
+# x['scores']=model.decision_function(x[['longitude','latitude']])
+# x['anomaly']=model.predict(x.loc[:,['longitude','latitude']])
+# lofs_index = where(x['anomaly']==-1)
+# values = x.iloc[lofs_index]
+
+# plt.scatter(x['longitude'], x['latitude'],s=1)
+# plt.scatter(values['longitude'],values['latitude'], color='r',s=1)
+# plt.show()
+
+
+# clf = LocalOutlierFactor(n_neighbors=2)
+# clf.fit_predict(cases_train[['longitude','latitude']])
 
 
 
 
-model=IsolationForest(n_estimators=150, max_samples='auto', contamination=float(0.0002),max_features=2)
-model.fit(x)
-x['scores']=model.decision_function(x[['longitude','latitude']])
-x['anomaly']=model.predict(x.loc[:,['longitude','latitude']])
-lofs_index = where(x['anomaly']==-1)
-values = x.iloc[lofs_index]
-
-plt.scatter(x['longitude'], x['latitude'],s=1)
-plt.scatter(values['longitude'],values['latitude'], color='r',s=1)
-plt.show()
 
 
-clf = LocalOutlierFactor(n_neighbors=2)
-clf.fit_predict(cases_train[['longitude','latitude']])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # index = cases_train.loc[cases_train['province'].str.contains(r"\bor\b", regex = True)].index
@@ -60,3 +90,31 @@ clf.fit_predict(cases_train[['longitude','latitude']])
 
 # index = where(lof<=thresh)
 # values = x.iloc[index]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
