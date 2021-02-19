@@ -140,6 +140,12 @@ cases_train['source'] = cases_train['source'].str.lower()
 cases_train.dropna(subset=['sex', 'age','province'], how='all',inplace=True)
 
 ############################################################################################################
+# Imputation process
+# Imputating longitude / latitude variable 
+
+cases_train = cases_train.loc[cases_train.longitude.notnull()]
+
+############################################################################################################
 # Impute age
 cases_train['age'] = cases_train['age'].fillna(value='')
 cases_train['age_range_ind'] = cases_train['age'].apply(age_range_dummy)
@@ -155,11 +161,6 @@ cases_train = impute(['longitude','latitude','date_confirmation'],'age',cases_tr
 cases_train['age'] = cases_train['age'].fillna(cases_train['age'].mode().iloc[0])
 cases_train['age_range'] = cases_train['age'].apply(age_range)
 
-############################################################################################################
-# Imputation process
-# Imputating longitude / latitude variable 
-
-cases_train = cases_train.loc[cases_train.longitude.notnull()]
 ###########################################################################################################
 
 # Imputating Additional information / Source 
