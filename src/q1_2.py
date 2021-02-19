@@ -10,6 +10,12 @@ import numpy as np
 from datetime import datetime
 from urllib.parse import urlparse
 import reverse_geocoder as rg
+import nltk
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+from nltk.probability import FreqDist
+stop = stopwords.words('english')
+
 
 def process_age(x,dataset):
     if "-" in x:
@@ -143,7 +149,6 @@ def q1_2():
     ############################################################################################################
     # Imputation process
     # Imputating longitude / latitude variable 
-    
     cases_train = cases_train.loc[cases_train.longitude.notnull()]
     
     ############################################################################################################
@@ -166,6 +171,10 @@ def q1_2():
     
     # Imputating Additional information / Source 
     cases_train['additional_information'] = cases_train['additional_information'].fillna(value='')
+    cases_train["additional_information"] = cases_train["additional_information"].astype(str)
+    cases_train["additional_information"] = cases_train["additional_information"].apply(nltk.word_tokenize)
+    cases_train["additional_information"] = cases_train['additional_information'].apply(lambda x: [item.lower() for item in x if item not in stop and item.isalnum()])
+
     cases_train['source'] = cases_train['source'].fillna(value='')
     cases_train['source'] = cases_train['source'].apply(parse_domain)
     
@@ -223,6 +232,10 @@ def q1_2():
     
     # Imputating Additional information / Source 
     cases_test['additional_information'] = cases_test['additional_information'].fillna(value='')
+    cases_test["additional_information"] = cases_test["additional_information"].astype(str)
+    cases_test["additional_information"] = cases_test["additional_information"].apply(nltk.word_tokenize)
+    cases_test["additional_information"] = cases_test['additional_information'].apply(lambda x: [item.lower() for item in x if item not in stop and item.isalnum()])
+
     cases_test['source'] = cases_test['source'].fillna(value='')
     cases_test['source'] = cases_test['source'].apply(parse_domain)
     
