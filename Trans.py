@@ -44,4 +44,4 @@ for loc in states:
 	new_line = pd.DataFrame([[loc,"US",date,lat,long_,confirmed,deaths,recovered,active,combined_key,inc,case_fat]], columns = ["Province_State","Country_Region","Last_Update","Lat","Long_","Confirmed","Deaths","Recovered","Active","Combined_Key","Incidence_Rate","Case-Fatality_Ratio"])
 	US_inv = pd.concat([US_inv, new_line], axis=0)
 
-US_inv.to_csv(r'location_transformed.csv',index=False)
+US_inv.to_csv("results/location_transformed.csv",index=False)
