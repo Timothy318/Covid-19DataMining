@@ -14,53 +14,53 @@ from mpl_toolkits.basemap import Basemap
 import numpy as np
 from global_land_mask import globe
 
-
-cases_train = pd.read_csv('../results/cases_train_preprocessed_imp.csv')
-print(cases_train.age.describe())
-plt.hist(cases_train.age)
-plt.show()
-freq_age = cases_train['age'].value_counts().to_frame()
-freq_age.reset_index(inplace=True)
-
-freq_sex = cases_train['sex'].value_counts().to_frame()
-freq_sex.reset_index(inplace=True)
-
-freq_country = cases_train['country'].value_counts().to_frame()
-freq_country.reset_index(inplace=True)
-
-freq_prov = cases_train['province'].value_counts().to_frame()
-freq_prov.reset_index(inplace=True)
-
-index = cases_train.loc[cases_train['province'].str.contains(r"\bor\b", regex = True)].index
-cases_train.drop(index,inplace=True)
-
-plt.figure(figsize=(20,20))
-m = Basemap(projection='cyl',
-	   llcrnrlat = -90,
-	   urcrnrlat = 90,
-	   llcrnrlon = -180,
-	   urcrnrlon = 180,
-	   resolution = 'h')
-m.shadedrelief()
-
-cases_train['land'] = globe.is_land(cases_train.latitude,cases_train.longitude)
-
-values = cases_train.loc[cases_train.land==False]
-values = values.loc[values.country != 'philippines']
-values = values.loc[ (values.province == 'rio grande do sul') |
-                      (values.province == 'santa catarina') | 
-                      (values.province == 'eastern cape')]
-index = values.index
-cases_train.drop(index,inplace=True)
-
-m.drawcoastlines()
-m.drawparallels(np.arange(-90,90,10),labels=[True,False,False,False])
-m.drawmeridians(np.arange(-180,180,30),labels=[0,0,0,1])
-m.scatter(cases_train.longitude,cases_train.latitude,latlon=True,s=0.5)
-m.scatter(values['longitude'],values['latitude'],latlon=True, color='r',s=0.5)
-plt.show()
-
-cases_train.to_csv('../results/cases_train_preprocessed.csv',index=False)
+def q1_3():
+    cases_train = pd.read_csv('../results/cases_train_preprocessed_imp.csv')
+    print(cases_train.age.describe())
+    plt.hist(cases_train.age)
+    plt.show()
+    freq_age = cases_train['age'].value_counts().to_frame()
+    freq_age.reset_index(inplace=True)
+    
+    freq_sex = cases_train['sex'].value_counts().to_frame()
+    freq_sex.reset_index(inplace=True)
+    
+    freq_country = cases_train['country'].value_counts().to_frame()
+    freq_country.reset_index(inplace=True)
+    
+    freq_prov = cases_train['province'].value_counts().to_frame()
+    freq_prov.reset_index(inplace=True)
+    
+    index = cases_train.loc[cases_train['province'].str.contains(r"\bor\b", regex = True)].index
+    cases_train.drop(index,inplace=True)
+    
+    plt.figure(figsize=(20,20))
+    m = Basemap(projection='cyl',
+    	   llcrnrlat = -90,
+    	   urcrnrlat = 90,
+    	   llcrnrlon = -180,
+    	   urcrnrlon = 180,
+    	   resolution = 'h')
+    m.shadedrelief()
+    
+    cases_train['land'] = globe.is_land(cases_train.latitude,cases_train.longitude)
+    
+    values = cases_train.loc[cases_train.land==False]
+    values = values.loc[values.country != 'philippines']
+    values = values.loc[ (values.province == 'rio grande do sul') |
+                          (values.province == 'santa catarina') | 
+                          (values.province == 'eastern cape')]
+    index = values.index
+    cases_train.drop(index,inplace=True)
+    
+    m.drawcoastlines()
+    m.drawparallels(np.arange(-90,90,10),labels=[True,False,False,False])
+    m.drawmeridians(np.arange(-180,180,30),labels=[0,0,0,1])
+    m.scatter(cases_train.longitude,cases_train.latitude,latlon=True,s=0.5)
+    m.scatter(values['longitude'],values['latitude'],latlon=True, color='r',s=0.5)
+    plt.show()
+    
+    cases_train.to_csv('../results/cases_train_preprocessed.csv',index=False)
 
 
 

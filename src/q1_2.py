@@ -47,9 +47,9 @@ def process_age(x,dataset):
     else:
         return None
     
-def filter_age(cond):
-    table = cases_train[cases_train['age'].str.contains(cond, regex=True)]
-    return table
+# def filter_age(cond):
+#     table = cases_train[cases_train['age'].str.contains(cond, regex=True)]
+#     return table
 
 def age_range(x):
     if x>=60:
@@ -125,137 +125,137 @@ def process_province(dataset):
     dataset.drop(columns=['admin1','admin2','cc','lon','lat','geom'],inplace=True)
     return dataset
 
-##############################################################################
-# Loading the data and gathering frequency information
-cases_train = pd.read_csv('../data/cases_train.csv')
-cases_test = pd.read_csv('../data/cases_test.csv')
-location = pd.read_csv('../data/location.csv')
+def q1_2():
+    ##############################################################################
+    # Loading the data and gathering frequency information
+    cases_train = pd.read_csv('../data/cases_train.csv')
+    cases_test = pd.read_csv('../data/cases_test.csv')
+    location = pd.read_csv('../data/location.csv')
+    
+    cases_train['latitude'] = cases_train['latitude'].astype(float)
+    cases_train['longitude'] = cases_train['longitude'].astype(float)
+    cases_train['province'] = cases_train['province'].str.lower()
+    cases_train['country'] = cases_train['country'].str.lower()
+    cases_train['additional_information'] = cases_train['additional_information'].str.lower()
+    cases_train['source'] = cases_train['source'].str.lower()
+    cases_train.dropna(subset=['sex', 'age','province'], how='all',inplace=True)
+    
+    ############################################################################################################
+    # Imputation process
+    # Imputating longitude / latitude variable 
+    
+    cases_train = cases_train.loc[cases_train.longitude.notnull()]
+    
+    ############################################################################################################
+    # Impute age
+    cases_train['age'] = cases_train['age'].fillna(value='')
+    cases_train['age_range_ind'] = cases_train['age'].apply(age_range_dummy)
+    cases_train['age'] = cases_train['age'].apply(process_age,dataset = 'train')
+    cases_train['age'] = cases_train['age'].astype(float)
+    cases_train['age'] = round(cases_train['age'],1)
+    cases_train.loc[(cases_train.age < 1) & (cases_train.age >0),'age'] = 0
+    index = cases_train.loc[(cases_train.age == 10000),'age'].index
+    cases_train.drop(index,inplace=True)
+    
+    cases_train = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_train,process_mode)
+    cases_train = impute(['longitude','latitude','date_confirmation'],'age',cases_train,process_mode)
+    cases_train['age'] = cases_train['age'].fillna(cases_train['age'].mode().iloc[0])
+    cases_train['age_range'] = cases_train['age'].apply(age_range)
+    
+    ###########################################################################################################
+    
+    # Imputating Additional information / Source 
+    cases_train['additional_information'] = cases_train['additional_information'].fillna(value='')
+    cases_train['source'] = cases_train['source'].fillna(value='')
+    cases_train['source'] = cases_train['source'].apply(parse_domain)
+    
+    ###########################################################################################################
+    # # Imputating date confirmation
+    cases_train = impute(['longitude','latitude'],'date_confirmation',cases_train,process_mode)
+    cases_train = impute(['province','country'],'date_confirmation',cases_train,process_mode)
+    
+    # Fill in the remaining with mode - most frequent value
+    cases_train['date_confirmation'] = cases_train['date_confirmation'].fillna(cases_train['date_confirmation'].mode().iloc[0])
+    
+    # Select the first one in date range
+    cases_train['date_confirmation'] = cases_train['date_confirmation'].apply(process_date_range) 
+    cases_train['date_confirmation'] = cases_train['date_confirmation'].apply(process_date_numerical) 
+    ############################################################################################################
+    # Imputating provincial , country
 
-cases_train['latitude'] = cases_train['latitude'].astype(float)
-cases_train['longitude'] = cases_train['longitude'].astype(float)
-cases_train['province'] = cases_train['province'].str.lower()
-cases_train['country'] = cases_train['country'].str.lower()
-cases_train['additional_information'] = cases_train['additional_information'].str.lower()
-cases_train['source'] = cases_train['source'].str.lower()
-cases_train.dropna(subset=['sex', 'age','province'], how='all',inplace=True)
-
-############################################################################################################
-# Imputation process
-# Imputating longitude / latitude variable 
-
-cases_train = cases_train.loc[cases_train.longitude.notnull()]
-
-############################################################################################################
-# Impute age
-cases_train['age'] = cases_train['age'].fillna(value='')
-cases_train['age_range_ind'] = cases_train['age'].apply(age_range_dummy)
-cases_train['age'] = cases_train['age'].apply(process_age,dataset = 'train')
-cases_train['age'] = cases_train['age'].astype(float)
-cases_train['age'] = round(cases_train['age'],1)
-cases_train.loc[(cases_train.age < 1) & (cases_train.age >0),'age'] = 0
-index = cases_train.loc[(cases_train.age == 10000),'age'].index
-cases_train.drop(index,inplace=True)
-
-cases_train = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_train,process_mode)
-cases_train = impute(['longitude','latitude','date_confirmation'],'age',cases_train,process_mode)
-cases_train['age'] = cases_train['age'].fillna(cases_train['age'].mode().iloc[0])
-cases_train['age_range'] = cases_train['age'].apply(age_range)
-
-###########################################################################################################
-
-# Imputating Additional information / Source 
-cases_train['additional_information'] = cases_train['additional_information'].fillna(value='')
-cases_train['source'] = cases_train['source'].fillna(value='')
-cases_train['source'] = cases_train['source'].apply(parse_domain)
-
-###########################################################################################################
-# # Imputating date confirmation
-cases_train = impute(['longitude','latitude'],'date_confirmation',cases_train,process_mode)
-cases_train = impute(['province','country'],'date_confirmation',cases_train,process_mode)
-
-# Fill in the remaining with mode - most frequent value
-cases_train['date_confirmation'] = cases_train['date_confirmation'].fillna(cases_train['date_confirmation'].mode().iloc[0])
-
-# Select the first one in date range
-cases_train['date_confirmation'] = cases_train['date_confirmation'].apply(process_date_range) 
-cases_train['date_confirmation'] = cases_train['date_confirmation'].apply(process_date_numerical) 
-############################################################################################################
-# Imputating provincial , country
-if __name__ == '__main__':
-    # missing_country = cases_train.loc[cases_train['country'].isnull()]
+        # missing_country = cases_train.loc[cases_train['country'].isnull()]
     
     cases_train = process_province(cases_train)
     cases_train['province'] = cases_train['province'].replace('',np.nan)
     cases_train = impute(['country'],'province',cases_train,process_mode)
     cases_train.loc[(cases_train.province == 'CABA'),'province'] = 'Buenos Aires'
     cases_train.loc[(cases_train.province.isnull()),'province'] = 'Invalid'
-
-############################################################################################################
-#Impute gender
-cases_train.loc[(cases_train.sex.isnull()),'sex'] = 'Not Available'
-
-###########################################################################################################
     
-
-""" Imputing Test dataset """
-
-############################################################################################################
-# Impute age
-cases_test['age'] = cases_test['age'].fillna(value='')
-cases_test['age_range_ind'] = cases_test['age'].apply(age_range_dummy)
-cases_test['age'] = cases_test['age'].apply(process_age,dataset='test')
-cases_test['age'] = cases_test['age'].astype(float)
-cases_test['age'] = round(cases_test['age'],1)
-cases_test.loc[(cases_test.age < 1) & (cases_test.age >0),'age'] = 0
-
-cases_test = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_test,process_mode)
-cases_test = impute(['longitude','latitude','date_confirmation'],'age',cases_test,process_mode)
-cases_test['age'] = cases_test['age'].fillna(cases_test['age'].mode().iloc[0])
-cases_test['age_range'] = cases_test['age'].apply(age_range)
-
-############################################################################################################
-# Imputation process
-# Imputating longitude / latitude variable 
-
-cases_test = cases_test.loc[cases_test.longitude.notnull()]
-###########################################################################################################
-
-# Imputating Additional information / Source 
-cases_test['additional_information'] = cases_test['additional_information'].fillna(value='')
-cases_test['source'] = cases_test['source'].fillna(value='')
-cases_test['source'] = cases_test['source'].apply(parse_domain)
-
-###########################################################################################################
-# # Imputating date confirmation
-cases_test = impute(['longitude','latitude'],'date_confirmation',cases_test,process_mode)
-cases_test = impute(['province','country'],'date_confirmation',cases_test,process_mode)
-
-# Fill in the remaining with mode - most frequent value
-cases_test['date_confirmation'] = cases_test['date_confirmation'].fillna(cases_test['date_confirmation'].mode().iloc[0])
-
-# Select the first one in date range
-cases_test['date_confirmation'] = cases_test['date_confirmation'].apply(process_date_range) 
-cases_test['date_confirmation'] = cases_test['date_confirmation'].apply(process_date_numerical) 
-############################################################################################################
-# Imputating provincial , country
-if __name__ == '__main__':
-    # missing_country = cases_test.loc[cases_test['country'].isnull()]
+    ############################################################################################################
+    #Impute gender
+    cases_train.loc[(cases_train.sex.isnull()),'sex'] = 'Not Available'
     
+    ###########################################################################################################
+        
+    
+    """ Imputing Test dataset """
+    
+    ############################################################################################################
+    # Impute age
+    cases_test['age'] = cases_test['age'].fillna(value='')
+    cases_test['age_range_ind'] = cases_test['age'].apply(age_range_dummy)
+    cases_test['age'] = cases_test['age'].apply(process_age,dataset='test')
+    cases_test['age'] = cases_test['age'].astype(float)
+    cases_test['age'] = round(cases_test['age'],1)
+    cases_test.loc[(cases_test.age < 1) & (cases_test.age >0),'age'] = 0
+    
+    cases_test = impute(['longitude','latitude','sex','date_confirmation'],'age',cases_test,process_mode)
+    cases_test = impute(['longitude','latitude','date_confirmation'],'age',cases_test,process_mode)
+    cases_test['age'] = cases_test['age'].fillna(cases_test['age'].mode().iloc[0])
+    cases_test['age_range'] = cases_test['age'].apply(age_range)
+    
+    ############################################################################################################
+    # Imputation process
+    # Imputating longitude / latitude variable 
+    
+    cases_test = cases_test.loc[cases_test.longitude.notnull()]
+    ###########################################################################################################
+    
+    # Imputating Additional information / Source 
+    cases_test['additional_information'] = cases_test['additional_information'].fillna(value='')
+    cases_test['source'] = cases_test['source'].fillna(value='')
+    cases_test['source'] = cases_test['source'].apply(parse_domain)
+    
+    ###########################################################################################################
+    # # Imputating date confirmation
+    cases_test = impute(['longitude','latitude'],'date_confirmation',cases_test,process_mode)
+    cases_test = impute(['province','country'],'date_confirmation',cases_test,process_mode)
+    
+    # Fill in the remaining with mode - most frequent value
+    cases_test['date_confirmation'] = cases_test['date_confirmation'].fillna(cases_test['date_confirmation'].mode().iloc[0])
+    
+    # Select the first one in date range
+    cases_test['date_confirmation'] = cases_test['date_confirmation'].apply(process_date_range) 
+    cases_test['date_confirmation'] = cases_test['date_confirmation'].apply(process_date_numerical) 
+    ############################################################################################################
+    # Imputating provincial , country
+        # missing_country = cases_test.loc[cases_test['country'].isnull()]
+        
     cases_test = process_province(cases_test)
     cases_test['province'] = cases_test['province'].replace('',np.nan)
     cases_test = impute(['country'],'province',cases_test,process_mode)
     cases_test.loc[(cases_test.province == 'CABA'),'province'] = 'Buenos Aires'
     cases_test.loc[(cases_test.province.isnull()),'province'] = 'Invalid'
-
-############################################################################################################
-#Impute gender
-cases_test.loc[(cases_test.sex.isnull()),'sex'] = 'Not Available'
-
-###########################################################################################################
-
-
-cases_train.to_csv('../results/cases_train_preprocessed.csv',index=False)
-cases_test.to_csv('../results/cases_test_preprocessed.csv',index=False)
+    
+    ############################################################################################################
+    #Impute gender
+    cases_test.loc[(cases_test.sex.isnull()),'sex'] = 'Not Available'
+    
+    ###########################################################################################################
+    
+    
+    cases_train.to_csv('../results/cases_train_preprocessed_imp.csv',index=False)
+    cases_test.to_csv('../results/cases_test_preprocessed.csv',index=False)
 
 
 
