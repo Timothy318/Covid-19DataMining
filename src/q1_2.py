@@ -17,6 +17,8 @@ from nltk.probability import FreqDist
 stop = stopwords.words('english')
 
 
+
+
 def process_age(x,dataset):
     if "-" in x:
         parse_age = x.split("-")
@@ -146,6 +148,13 @@ def q1_2():
     cases_train['source'] = cases_train['source'].str.lower()
     cases_train.dropna(subset=['sex', 'age','province'], how='all',inplace=True)
     
+    cases_test['latitude'] = cases_test['latitude'].astype(float)
+    cases_test['longitude'] = cases_test['longitude'].astype(float)
+    cases_test['province'] = cases_test['province'].str.lower()
+    cases_test['country'] = cases_test['country'].str.lower()
+    cases_test['additional_information'] = cases_test['additional_information'].str.lower()
+    cases_test['source'] = cases_test['source'].str.lower()
+    
     ############################################################################################################
     # Imputation process
     # Imputating longitude / latitude variable 
@@ -197,9 +206,11 @@ def q1_2():
     cases_train = process_province(cases_train)
     cases_train['province'] = cases_train['province'].replace('',np.nan)
     cases_train = impute(['country'],'province',cases_train,process_mode)
-    cases_train.loc[(cases_train.province == 'CABA'),'province'] = 'Buenos Aires'
+    cases_train.loc[(cases_train.province == 'caba'),'province'] = 'Buenos Aires'
     cases_train.loc[(cases_train.province.isnull()),'province'] = 'Invalid'
-    
+    cases_train['province'] = cases_train['province'].str.lower()
+    cases_train['province'] = cases_train['province'].replace(r'prefecture','',regex=True)
+    cases_train['province'] = cases_train['province'].apply(lambda x: x.strip())
     ############################################################################################################
     #Impute gender
     cases_train.loc[(cases_train.sex.isnull()),'sex'] = 'Not Available'
@@ -257,9 +268,11 @@ def q1_2():
     cases_test = process_province(cases_test)
     cases_test['province'] = cases_test['province'].replace('',np.nan)
     cases_test = impute(['country'],'province',cases_test,process_mode)
-    cases_test.loc[(cases_test.province == 'CABA'),'province'] = 'Buenos Aires'
+    cases_test.loc[(cases_test.province == 'caba'),'province'] = 'Buenos Aires'
     cases_test.loc[(cases_test.province.isnull()),'province'] = 'Invalid'
-    
+    cases_test['province'] = cases_test['province'].str.lower()
+    cases_test['province'] = cases_test['province'].replace(r'prefecture','',regex=True)
+    cases_test['province'] = cases_test['province'].apply(lambda x: x.strip())
     ############################################################################################################
     #Impute gender
     cases_test.loc[(cases_test.sex.isnull()),'sex'] = 'Not Available'
