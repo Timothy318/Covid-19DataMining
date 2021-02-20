@@ -16,9 +16,6 @@ from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 stop = stopwords.words('english')
 
-
-
-
 def process_age(x,dataset):
     if "-" in x:
         parse_age = x.split("-")
@@ -118,7 +115,7 @@ def impute(criteria,target,dataset,func):
 
 def process_province(dataset):
     dataset = impute(['longitude','latitude'],'country',dataset,process_mode)
-    dataset.loc[(dataset.province == "taiwan"),'country'] = "China"
+    dataset.loc[(dataset.province == "taiwan"),'country'] = "china"
     dataset = impute(['longitude','latitude'],'province',dataset,process_mode)
 
     dataset['geom'] = list(zip(dataset['latitude'] , dataset['longitude']))
@@ -211,6 +208,7 @@ def q1_2():
     cases_train['province'] = cases_train['province'].str.lower()
     cases_train['province'] = cases_train['province'].replace(r'prefecture','',regex=True)
     cases_train['province'] = cases_train['province'].apply(lambda x: x.strip())
+    cases_train.loc[cases_train.country.str.contains('congo'),'country'] = 'congo'
     ############################################################################################################
     #Impute gender
     cases_train.loc[(cases_train.sex.isnull()),'sex'] = 'Not Available'
@@ -273,6 +271,7 @@ def q1_2():
     cases_test['province'] = cases_test['province'].str.lower()
     cases_test['province'] = cases_test['province'].replace(r'prefecture','',regex=True)
     cases_test['province'] = cases_test['province'].apply(lambda x: x.strip())
+    cases_test.loc[cases_test.country.str.contains('congo'),'country'] = 'congo'
     ############################################################################################################
     #Impute gender
     cases_test.loc[(cases_test.sex.isnull()),'sex'] = 'Not Available'
@@ -281,7 +280,7 @@ def q1_2():
     
     
     cases_train.to_csv('../results/cases_train_preprocessed_imp.csv',index=False)
-    cases_test.to_csv('../results/cases_test_preprocessed.csv',index=False)
+    cases_test.to_csv('../results/cases_test_preprocessed_imp.csv',index=False)
 
 
 

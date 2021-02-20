@@ -17,6 +17,7 @@ from global_land_mask import globe
 def q1_3():
     cases_train = pd.read_csv('../results/cases_train_preprocessed_imp.csv')
     print(cases_train.age.describe())
+    print(len(cases_train))
     plt.hist(cases_train.age)
     plt.show()
     freq_age = cases_train['age'].value_counts().to_frame()
@@ -33,15 +34,15 @@ def q1_3():
     
     index = cases_train.loc[cases_train['province'].str.contains(r"\bor\b", regex = True)].index
     cases_train.drop(index,inplace=True)
-    
-    plt.figure(figsize=(20,20))
-    m = Basemap(projection='cyl',
-    	   llcrnrlat = -90,
-    	   urcrnrlat = 90,
-    	   llcrnrlon = -180,
-    	   urcrnrlon = 180,
-    	   resolution = 'h')
-    m.shadedrelief()
+    print(len(cases_train))
+    # plt.figure(figsize=(20,20))
+    # m = Basemap(projection='cyl',
+    # 	   llcrnrlat = -90,
+    # 	   urcrnrlat = 90,
+    # 	   llcrnrlon = -180,
+    # 	   urcrnrlon = 180,
+    # 	   resolution = 'h')
+    # m.shadedrelief()
     
     cases_train['land'] = globe.is_land(cases_train.latitude,cases_train.longitude)
     
@@ -52,15 +53,15 @@ def q1_3():
                           (values.province == 'eastern cape')]
     index = values.index
     cases_train.drop(index,inplace=True)
+    print(len(cases_train))
+    # m.drawcoastlines()
+    # m.drawparallels(np.arange(-90,90,10),labels=[True,False,False,False])
+    # m.drawmeridians(np.arange(-180,180,30),labels=[0,0,0,1])
+    # m.scatter(cases_train.longitude,cases_train.latitude,latlon=True,s=0.5)
+    # m.scatter(values['longitude'],values['latitude'],latlon=True, color='r',s=0.5)
+    # plt.show()
     
-    m.drawcoastlines()
-    m.drawparallels(np.arange(-90,90,10),labels=[True,False,False,False])
-    m.drawmeridians(np.arange(-180,180,30),labels=[0,0,0,1])
-    m.scatter(cases_train.longitude,cases_train.latitude,latlon=True,s=0.5)
-    m.scatter(values['longitude'],values['latitude'],latlon=True, color='r',s=0.5)
-    plt.show()
-    
-    cases_train.to_csv('../results/cases_train_preprocessed.csv',index=False)
+    cases_train.to_csv('../results/cases_train_preprocessed_outlier.csv',index=False)
 
 
 
