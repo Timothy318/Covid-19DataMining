@@ -21,7 +21,9 @@ def q1_5(name):
     location.loc[location.Country_Region=='korea, south','Country_Region'] = 'south korea'
     location.loc[location.Province_State=='andalusia','Province_State'] = 'andalucia'
     location.loc[location.Country_Region=='czechia','Country_Region'] = 'czech republic'
-    
+    location.loc[location.Country_Region=='congo (brazzaville)','Country_Region'] = 'republic of congo'
+    location.loc[location.Country_Region=='congo (kinshasa)','Country_Region'] = 'democratic republic of the congo'
+
     merge = pd.merge(dataset, location, how='left', left_on=['latitude','longitude'], right_on=['Lat','Long_'])
     merge.dropna(subset=['Confirmed', 'Deaths', 'Recovered'], how='all',inplace=True)
     result = merge
@@ -53,27 +55,16 @@ def q1_5(name):
     dataset = dataset.iloc[index]
     dataset.reset_index(inplace=True,drop=True)
     
-    
-    merge = pd.merge(dataset, location, how='left', left_on=['province'], right_on=['Province_State'])
-    merge.dropna(subset=['Confirmed', 'Deaths', 'Recovered'], how='all',inplace=True)
-    result = pd.concat([result, merge])
-    result.drop(['Lat', 'Long_','Province_State','Country_Region','Combined_Key'], axis=1,inplace=True)
-    
-    index = list(set(dataset.index) - set(merge.index))
-    dataset = dataset.iloc[index]
-    dataset.reset_index(inplace=True,drop=True)
-    
-    
     freq_country = dataset['country'].value_counts().to_frame()
     freq_country.reset_index(inplace=True)
     
     cur_loc = list(freq_country['index'])
     cur_loc = location.loc[location['Country_Region'].isin(cur_loc)]
     cur_loc = location.groupby('Country_Region').agg('mean')
+    
     cur_loc.reset_index(inplace=True)
     cur_loc.drop(['Lat', 'Long_'], axis=1,inplace=True)
     cur_loc['Case-Fatality_Ratio'] = (cur_loc.Deaths/cur_loc.Confirmed)*100
-    
     
     merge = pd.merge(dataset, cur_loc, how='left', left_on=['country'], right_on=['Country_Region'])
     merge.dropna(subset=['Confirmed', 'Deaths', 'Recovered'], how='all',inplace=True)
@@ -84,7 +75,7 @@ def q1_5(name):
     dataset = dataset.iloc[index]
     dataset.reset_index(inplace=True,drop=True)
     
-    
+
     dataset['Confirmed'] = result.Confirmed.mean()
     dataset['Deaths'] = result.Deaths.mean()
     dataset['Recovered'] = result.Recovered.mean()
@@ -93,8 +84,8 @@ def q1_5(name):
     dataset['Case-Fatality_Ratio'] = result['Case-Fatality_Ratio'].mean()
     
     result = pd.concat([result, dataset])
-
     if name == 'train':
         result.to_csv(r'../results/cases_train_preprocessed.csv',index=False)
     else:
         result.to_csv(r'../results/cases_test_preprocessed.csv',index=False)
+

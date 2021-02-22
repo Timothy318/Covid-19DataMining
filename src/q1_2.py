@@ -208,7 +208,7 @@ def q1_2():
     cases_train['province'] = cases_train['province'].str.lower()
     cases_train['province'] = cases_train['province'].replace(r'prefecture','',regex=True)
     cases_train['province'] = cases_train['province'].apply(lambda x: x.strip())
-    cases_train.loc[cases_train.country.str.contains('congo'),'country'] = 'congo'
+    # cases_train.loc[cases_train.country.str.contains('congo'),'country'] = 'congo'
     ############################################################################################################
     #Impute gender
     cases_train.loc[(cases_train.sex.isnull()),'sex'] = 'Not Available'
@@ -271,7 +271,7 @@ def q1_2():
     cases_test['province'] = cases_test['province'].str.lower()
     cases_test['province'] = cases_test['province'].replace(r'prefecture','',regex=True)
     cases_test['province'] = cases_test['province'].apply(lambda x: x.strip())
-    cases_test.loc[cases_test.country.str.contains('congo'),'country'] = 'congo'
+    # cases_test.loc[cases_test.country.str.contains('congo'),'country'] = 'congo'
     ############################################################################################################
     #Impute gender
     cases_test.loc[(cases_test.sex.isnull()),'sex'] = 'Not Available'
