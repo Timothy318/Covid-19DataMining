@@ -37,11 +37,11 @@ for loc in states:
 	#sum incidence rate
 	inc = states_df[loc]['Incidence_Rate'].sum()
 	#new combined key
-	combined_key = loc + ", US"
+	combined_key = loc + ", United States"
 	#re-calculate case-fataility (death/all) *100
 	case_fat = (deaths/confirmed)*100
 	#add row to US_inv DF, save to .csv
-	new_line = pd.DataFrame([[loc,"US",date,lat,long_,confirmed,deaths,recovered,active,combined_key,inc,case_fat]], columns = ["Province_State","Country_Region","Last_Update","Lat","Long_","Confirmed","Deaths","Recovered","Active","Combined_Key","Incidence_Rate","Case-Fatality_Ratio"])
+	new_line = pd.DataFrame([[loc,"United States",date,lat,long_,confirmed,deaths,recovered,active,combined_key,inc,case_fat]], columns = ["Province_State","Country_Region","Last_Update","Lat","Long_","Confirmed","Deaths","Recovered","Active","Combined_Key","Incidence_Rate","Case-Fatality_Ratio"])
 	US_inv = pd.concat([US_inv, new_line], axis=0)
 
 US_inv.to_csv("results/location_transformed.csv",index=False)
