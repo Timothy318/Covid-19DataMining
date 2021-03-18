@@ -26,4 +26,4 @@ if __name__ == '__main__':
 
     train = pd.read_csv(r'../results/cases_train_preprocessed.csv',dtype=object)
     test =  pd.read_csv(r'../results/cases_test_preprocessed.csv',dtype=object)
-    df_tr, df_te = train_test_split(train, test_size=0.2, random_state = 43)
+    df_tr, df_te = train_test_split(train, test_size=0.2, random_state = 1)
