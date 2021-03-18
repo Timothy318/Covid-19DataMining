@@ -1,1 +1,2 @@
 # Cmpt459Project
+# The code contains external package call basemap to generate the heatmap. Please install it if you wishes to see the output of the heatmap otherwise comment out any section containing such related code. There are other packages used as well and few of which require network connection. The stopword dictionary also needs to be download via ntlk as well, instructions will be prompt upon error for the download. The running time of the codes in total may take up to 5 min depending on the network connection, please wait patiently. 
