@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 #%%
 def cat_boost():  
-    train = pd.read_csv(r'../results/cases_train_preprocessed.csv',dtype=object)
+    train = pd.read_csv(r'../data/cases_train_preprocessed.csv',dtype=object)
     # There are no information that can be introduce from this column, drop it
     train.drop(columns=['land','Last_Update','province','country'],inplace=True)
     # Reloading into dataframe cause empty strings to be NaN again
@@ -60,13 +60,13 @@ def cat_boost():
                                 auto_class_weights = 'SqrtBalanced')
     
     model.fit(df_tr_data)
-    filename = 'catboost_classifier.pkl'
+    filename = '../models/catboost_classifier.pkl'
     pickle.dump(model, open(filename, 'wb'))
     
     # Evaluation
 
     label = ['hospitalized', 'nonhospitalized','recovered', 'deceased']
-    filename = 'catboost_classifier.pkl'
+    filename = '../models/catboost_classifier.pkl'
     model = pickle.load(open(filename, 'rb'))
     
     global df_tr_pred, ev_tr_report, ev_tr_accuracy,ev_tr_matrix

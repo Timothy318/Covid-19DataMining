@@ -24,8 +24,7 @@ def Hot_Encode(data):
 	return data
 
 #load in the data
-train = pd.read_csv(r'../results/cases_train_preprocessed.csv',dtype=object)
-#test =  pd.read_csv(r'../results/cases_test_preprocessed.csv',dtype=object)
+train = pd.read_csv(r'../data/cases_train_preprocessed.csv',dtype=object)
 
 #Dropping land column, age_range_ind, and Last_Updated, and source
 train = train.drop(columns = "land")
@@ -63,10 +62,10 @@ knnPickle = open('../models/knn_classifier.pkl','wb')
 pickle.dump(classifier, knnPickle)
 
 #Save my validation data x_te, y_te data to open in new file
-y_te.to_csv('y_te.csv', index=False)
-pd.DataFrame(x_te).to_csv('x_te.csv', index =False)
+y_te.to_csv('./knn/y_te.csv', index=False)
+pd.DataFrame(x_te).to_csv('./knn/x_te.csv', index =False)
 #saving my training data since apperently i have to 'load my model' later on...
-y_tr.to_csv('y_tr.csv', index= False)
-pd.DataFrame(x_tr).to_csv('x_tr.csv', index=False)
+y_tr.to_csv('./knn/y_tr.csv', index= False)
+pd.DataFrame(x_tr).to_csv('./knn/x_tr.csv', index=False)
 
 print("Finished Constructing KNN model with k neightbours = " + str(k_neigh) + ".")

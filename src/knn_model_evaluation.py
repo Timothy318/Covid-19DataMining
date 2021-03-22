@@ -3,18 +3,18 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
-from mlxtend.plotting import plot_decision_regions
+# from mlxtend.plotting import plot_decision_regions
 import matplotlib.pyplot as plt
 import pickle
 
 #2.3 "load the saved models from task 2.2, ..."
 #assuming i'm not allowed to keep working in the same file then....
 #I only see us uploading .main though, so this can be streamlined.
-classifier = pickle.load(open('knn_classifier.pkl', 'rb'))
-y_te = pd.read_csv('y_te.csv',dtype = object)
-x_te = pd.read_csv('x_te.csv')
-y_tr = pd.read_csv('y_tr.csv',dtype = object)
-x_tr = pd.read_csv('x_tr.csv')
+classifier = pickle.load(open('../models/knn_classifier.pkl', 'rb'))
+y_te = pd.read_csv('./knn/y_te.csv',dtype = object)
+x_te = pd.read_csv('./knn/x_te.csv')
+y_tr = pd.read_csv('./knn/y_tr.csv',dtype = object)
+x_tr = pd.read_csv('./knn/x_tr.csv')
 
 print("Predicting on validation data with knn model, hang on, this might take a minute.")
 prediction = classifier.predict(x_te)

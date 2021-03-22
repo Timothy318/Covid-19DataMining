@@ -1,3 +1,5 @@
 
 *.pkl
 *.pkl
+src/knn/y_te.csv
+src/knn/y_tr.csv
