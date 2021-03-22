@@ -50,15 +50,15 @@ df_va_data = Pool(data = df_va_x,
                text_features=text_feature)
 
 #%% Training
-model = CatBoostClassifier(n_estimators=300, 
+model = CatBoostClassifier(n_estimators=400, 
                             task_type="GPU",
                             devices='0:1',
-                            learning_rate=0.5,
-                            depth=14,
+                            learning_rate=0.20,
+                            depth=10,
                             loss_function='MultiClass',
                             random_seed = 1,
-                            l2_leaf_reg = 0.2,
-                            auto_class_weights = 'Balanced')
+                            # l2_leaf_reg = 0.8,
+                            auto_class_weights = 'SqrtBalanced')
 
 model.fit(df_tr_data)
 filename = 'catboost_classifier.pkl'
@@ -66,14 +66,14 @@ pickle.dump(model, open(filename, 'wb'))
 
 #%% Evaluation
 label = ['hospitalized', 'nonhospitalized','recovered', 'deceased']
+filename = 'catboost_classifier.pkl'
+model = pickle.load(open(filename, 'rb'))
 
 df_tr_pred = model.predict(df_tr_data)
 ev_tr_report = classification_report(df_tr_y, df_tr_pred)
 ev_tr_accuracy = accuracy_score(df_tr_y, df_tr_pred)
 ev_tr_matrix = confusion_matrix(df_tr_y, df_tr_pred,labels=label)
 ConfusionMatrixDisplay(ev_tr_matrix).plot()
-
-
 
 df_va_pred = model.predict(df_va_data)
 ev_va_report = classification_report(df_va_y, df_va_pred)
@@ -99,12 +99,11 @@ for n in n_estimators:
     tmp_model = CatBoostClassifier(n_estimators=n, 
                             task_type="GPU",
                             devices='0:1',
-                            learning_rate=1,
+                            learning_rate=0.20,
                             depth=10,
                             loss_function='MultiClass',
                             random_seed = 1,
-                            l2_leaf_reg = 2,
-                            auto_class_weights = 'Balanced')
+                            auto_class_weights = 'SqrtBalanced')
 
     tmp_model.fit(df_tr_data)
 
@@ -139,7 +138,7 @@ plt.figure(1)
 plt.plot(n_estimators, plt_tr_precision,label="training")
 plt.plot(n_estimators, plt_va_precision,label="validation")
 plt.legend()
-plt.title("Plot of weighted precision against n_est")
+plt.title("Catboost:Plot of macro precision vs n_est")
 # plt.yticks(np.arange(0.7, 0.9, 0.02))
 plt.show()
 
@@ -148,15 +147,17 @@ plt.figure(3)
 plt.plot(n_estimators, plt_tr_f1,label="training")
 plt.plot(n_estimators, plt_va_f1,label="validation")
 plt.legend()
-plt.title("Plot of weighted f1 against n_est")
+plt.title("Catboost:Plot of macro F1 score vs n_est")
 # plt.yticks(np.arange(0.7, 0.9, 0.02))
+plt.xlabel("n_estimator")
+plt.ylabel("Macro F1 Score")
 plt.show()
 
 plt.figure(4)
 plt.plot(n_estimators, plt_tr_recall,label="training")
 plt.plot(n_estimators, plt_va_recall,label="validation")
 plt.legend()
-plt.title("Plot of weighted recall against n_est")
+plt.title("Catboost:Plot of macro recall vs n_est")
 # plt.yticks(np.arange(0.7, 0.9, 0.02))
 plt.show()
 
