@@ -86,8 +86,9 @@ def cat_boost():
  
     
     # Overfitting
+    print()
     n_estimators = [10, 25, 50, 100, 200, 300, 400]
-    # n_estimators = [1,2,3]
+    # n_estimators = [1]
     plt_tr_precision = []
     plt_tr_recall = []
     plt_tr_f1 = []
@@ -135,30 +136,23 @@ def cat_boost():
         print()
         
     plt.figure(0)
-    # plt.plot(n_estimators, plt_tr_precision,label="training")
-    # plt.plot(n_estimators, plt_va_precision,label="validation")
-    # plt.legend()
-    # plt.title("Catboost:Plot of macro precision vs n_est")
-    # # plt.yticks(np.arange(0.7, 0.9, 0.02))
-    # plt.show()
-    print(plt_tr_f1)
-    print(plt_va_f1)
     plt.plot(n_estimators, plt_tr_f1,label="training")
     plt.plot(n_estimators, plt_va_f1,label="validation")
     plt.legend()
     plt.title("Catboost:Plot of macro F1 score vs n_est")
-    # plt.yticks(np.arange(0.7, 0.9, 0.02))
     plt.xlabel("n_estimator")
     plt.ylabel("Macro F1 Score")
-    plt.show()
+    plt.show(block=True)
     
-    # plt.figure(4)
-    # plt.plot(n_estimators, plt_tr_recall,label="training")
-    # plt.plot(n_estimators, plt_va_recall,label="validation")
-    # plt.legend()
-    # plt.title("Catboost:Plot of macro recall vs n_est")
-    # # plt.yticks(np.arange(0.7, 0.9, 0.02))
-    # plt.show()
+    print("Training:")
+    print('Metric Report\n',ev_tr_report)
+    print('Accuracy',ev_tr_accuracy)
+    print('Confusion Matrix\n',ev_tr_matrix)
+    
+    print('Evaluation:')
+    print("Metric Report\n",ev_va_report)
+    print('Accuracy',ev_va_accuracy)
+    print('Confusion Matrix\n',ev_va_matrix)
     
     del tmp_model
     del tmp_tr_pred
@@ -174,7 +168,8 @@ def cat_boost():
     del tmp_va_accuracy
 
 #%%
-cat_boost()
+if __name__ == '__main__':
+    cat_boost()
 
 
 
@@ -203,4 +198,19 @@ cat_boost()
 # a5 = recall_score(df_va_y, df_va_pred, average="micro")
 # a6 = recall_score(df_va_y, df_va_pred, average="weighted")
 
+    
+    
+# plt.figure(4)
+# plt.plot(n_estimators, plt_tr_recall,label="training")
+# plt.plot(n_estimators, plt_va_recall,label="validation")
+# plt.legend()
+# plt.title("Catboost:Plot of macro recall vs n_est")
+# # plt.yticks(np.arange(0.7, 0.9, 0.02))
+# plt.show()
 
+# plt.plot(n_estimators, plt_tr_precision,label="training")
+# plt.plot(n_estimators, plt_va_precision,label="validation")
+# plt.legend()
+# plt.title("Catboost:Plot of macro precision vs n_est")
+# # plt.yticks(np.arange(0.7, 0.9, 0.02))
+# plt.show()
