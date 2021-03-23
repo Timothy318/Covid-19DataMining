@@ -5,10 +5,10 @@ Created on Thu Feb 18 17:17:51 2021
 @author: wlian
 """
 
-from q1_2 import q1_2
-from q1_3 import q1_3
-from q1_4 import q1_4
-from q1_5 import q1_5
+# from q1_2 import q1_2
+# from q1_3 import q1_3
+# from q1_4 import q1_4
+# from q1_5 import q1_5
 import os 
 
 import pandas as pd
