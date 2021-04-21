@@ -15,8 +15,6 @@ import numpy as np
 #TODO:Load & One-hot encode the Covid Dataset (same as in Knn)
 #boston = load_boston()
 train = pd.read_csv(r'../../data/cases_train_preprocessed.csv',dtype=object)
-print(train.head)
-input()
 #Drop columns
 train = train.drop(columns = ['date_confirmation','source','age_range_ind','land','Last_Update','country','province'])
 
@@ -35,9 +33,9 @@ train = train.drop(columns = ['sex','age_range'])
 X = train.drop(columns = 'outcome')
 y = train.outcome
 
-#labels = train['outcome'].unique()
-#labels_m = {v: k for v, k in enumerate(labels)}
-#labels_mb = {k: v for v, k in enumerate(labels)}
+labels = train['outcome'].unique()
+labels_m = {v: k for v, k in enumerate(labels)}
+labels_mb = {k: v for v, k in enumerate(labels)}
 
 label_encoder = LabelEncoder()
 label_encoder = label_encoder.fit(y)
@@ -58,9 +56,17 @@ print(model)
 y_pred_test = model.predict(X_test)
 predictions_te = [round(value) for value in y_pred_test]
 #evaluations
+predictions_te = list(map(labels_m.get,predictions_te))
+y_test = list(map(labels_m.get,y_test))
 print(classification_report(y_test,predictions_te))
 
 #predict on train data
 y_pred_train = model.predict(X_train)
 predictions_tr = [round(value) for value in y_pred_train]
+predictions_tr = list(map(labels_m.get,predictions_tr))
+y_train = list(map(labels_m.get,y_train))
 print(classification_report(y_train,predictions_tr))
+
+
+#Tune parameters
+#Do cross validation on the dataset
