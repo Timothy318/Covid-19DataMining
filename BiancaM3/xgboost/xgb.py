@@ -38,8 +38,6 @@ y = train.outcome
 #labels = train['outcome'].unique()
 #labels_m = {v: k for v, k in enumerate(labels)}
 #labels_mb = {k: v for v, k in enumerate(labels)}
-print(X.size)
-print(len(y))
 
 label_encoder = LabelEncoder()
 label_encoder = label_encoder.fit(y)
@@ -48,43 +46,21 @@ label_encoded_y = label_encoder.transform(y)
 X = X.apply(pd.to_numeric)
 label_encoded_y = pd.to_numeric(label_encoded_y)
 
-#convert data into optimized 'Dmatrix' struct
-#data_dmatrix = xgb.DMatrix(data=X,label=y)
-
 #same random state as in milestone 2
 X_train, X_test, y_train, y_test = train_test_split(X,label_encoded_y,test_size = 0.2, random_state = 1)
-#xg_reg = xgb.XGBRegressor(objective = 'multi:softprob, colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 10)
-#xg_reg.fit(X_train,y_train)
-#preds = xg_reg.predict(X_test)
 
-#fit model
+#fit model 
 model = xgb.XGBClassifier(use_label_encoder = False) #currently it's choosing its own parameters, i think
 model.fit(X_train,y_train)
 print(model)
 
-#predict
-y_pred = model.predict(X_test)
-predictions = [round(value) for value in y_pred]
-
+#predict on test data
+y_pred_test = model.predict(X_test)
+predictions_te = [round(value) for value in y_pred_test]
 #evaluations
-#print(y_pred)
-#print(predictions)
-print(y_test.size)
-print(len(predictions))
-print(classification_report(y_test,predictions))
+print(classification_report(y_test,predictions_te))
 
-
-
-#rmse = np.sqrt(mean_squared_error(y_test,preds))
-#print("RMSE: %f" % (rmse))
-
-#TODO: To predict labels, instead of price..
-#Change objective = multi:softprob
-#feed in class labels (0,1,2,3) = (hospitalized, nonhospitalized, recovered, deceased)
-#Figure out params for dataset
-
-#Milestone 3 TODO:
-#hypertuning of params
-
-
-
+#predict on train data
+y_pred_train = model.predict(X_train)
+predictions_tr = [round(value) for value in y_pred_train]
+print(classification_report(y_train,predictions_tr))
