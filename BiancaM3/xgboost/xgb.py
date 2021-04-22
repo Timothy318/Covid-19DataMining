@@ -10,10 +10,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
 from sklearn.metrics import f1_score
 import numpy as np 
-
+import pickle
 
 #TODO:Load & One-hot encode the Covid Dataset (same as in Knn)
-#boston = load_boston()
 train = pd.read_csv(r'../../data/cases_train_preprocessed.csv',dtype=object)
 #Drop columns
 train = train.drop(columns = ['date_confirmation','source','age_range_ind','land','Last_Update','country','province'])
@@ -50,7 +49,15 @@ label_encoded_y = pd.to_numeric(label_encoded_y)
 X_train, X_test, y_train, y_test = train_test_split(X,label_encoded_y,test_size = 0.2, random_state = 1)
 
 #fit model 
-model = xgb.XGBClassifier(use_label_encoder = False) #currently it's choosing its own parameters, i think
+#min_child_weight tuned too low = overfitting
+#max_depth too high = overfitting (typically 3-10)
+#max_delta_step, might help with the extremely impbalanced step!
+#subsample too high = overfitting (typcially 0.5-1)
+#lambda can be used to reduce overfitting as well, it handles regularization
+#scale_pos_weight should be positive when high class imbalance (like we have!)
+#seed = 1 for parameter tuning
+#learning_rate will shrink weights on model (can make model more robust, typically 0.01-0.2)
+model = xgb.XGBClassifier(learning_rate=0.3, min_child_weight=1,max_depth=10,max_delta_step=0, subsample=1, reg_lamdba=1, scale_pos_weight=1,objective='multi:softprob', use_label_encoder = False, seed=1)
 model.fit(X_train,y_train)
 print(model)
 
