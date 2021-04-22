@@ -36,10 +36,12 @@ y = train.outcome
 labels = train['outcome'].unique()
 labels_m = {v: k for v, k in enumerate(labels)}
 labels_mb = {k: v for v, k in enumerate(labels)}
+label_encoded_y = list(map(labels_mb.get,y))
 
-label_encoder = LabelEncoder()
-label_encoder = label_encoder.fit(y)
-label_encoded_y = label_encoder.transform(y)
+
+#label_encoder = LabelEncoder()
+#label_encoder = label_encoder.fit(y)
+#label_encoded_y = label_encoder.transform(y)
 
 X = X.apply(pd.to_numeric)
 label_encoded_y = pd.to_numeric(label_encoded_y)
