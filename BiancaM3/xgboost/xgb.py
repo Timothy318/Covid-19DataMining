@@ -107,6 +107,10 @@ def Predict_Metrics(labels,X_test,X_train,y_train,y_test,model):
 	predictions_te = list(map(labels_m.get,predictions_te))
 	y_test = list(map(labels_m.get,y_test))
 	print(classification_report(y_test,predictions_te))
+	print(len(y_test))
+	print(len(predictions_te))
+	matrix_te = confusion_matrix(y_test,predictions_te,labels=labels)
+	ConfusionMatrixDisplay(matrix_te).plot()
 
 	#predict on train(validation) data
 	print("Metrics on the Validation Data")
@@ -115,6 +119,8 @@ def Predict_Metrics(labels,X_test,X_train,y_train,y_test,model):
 	predictions_tr = list(map(labels_m.get,predictions_tr))
 	y_train = list(map(labels_m.get,y_train))
 	print(classification_report(y_train,predictions_tr))
+	matrix_tr = confusion_matrix(y_train,predictions_tr,labels=labels)
+	ConfusionMatrixDisplay(matrix_tr).plot()
 
 
 X_train, X_test, y_train, y_test,labels = Get_Data()
