@@ -10,6 +10,7 @@ from scipy.stats import uniform, truncnorm, randint, binom
 from sklearn.metrics import roc_curve, auc, precision_score, confusion_matrix, ConfusionMatrixDisplay, recall_score, accuracy_score, f1_score, classification_report, make_scorer
 import numpy as np 
 import pickle
+import matplotlib.pyplot as plt
 
 #load in my training data
 train = pd.read_csv(r'../../data/cases_train_preprocessed.csv',dtype=object)
@@ -41,46 +42,50 @@ label_encoded_y = pd.to_numeric(label_encoded_y)
 
 #same random state as in milestone 2
 X_train, X_test, y_train, y_test = train_test_split(X,label_encoded_y,test_size = 0.2, random_state = 1)
+dtrain = xgb.DMatrix(X_train)
+dtest = xgb.DMatrix(X_test)
 
-#HyperParameter Tuning (Same as Catboost model)
+
+#HyperParameter Tuning
 #I'm going to tune max_depth, max_child_weight, and eta (learning_rate)
-grid_param={'learning_rate':uniform(0.1,0.2),
-				#'max_depth':randint(3,10),
-				#'min_child_weight':uniform(0.1,2)
+grid_param={'learning_rate':[0.01,0.02,0.03,0.04,0.05],
+				'max_depth':[6,7,8,9,10],
+				'min_child_weight': [0.2,0.4,0.6,0.8,1]
 				}
 
 scorer = {'f1_macro' : make_scorer(f1_score, average='macro'),
-'recall_macro': make_scorer(recall_score , average='macro'),
-'accuracy': make_scorer(accuracy_score),
-'recall_d' : make_scorer(recall_score,average=None,labels=['deceased']),
-'f1_d' : make_scorer(f1_score, average=None, labels=['deceased'])}
+ 'recall_macro': make_scorer(recall_score , average='macro'),
+ 'accuracy': make_scorer(accuracy_score),
+ 'recall_d' : make_scorer(recall_score,average=None,labels=[3]),
+'f1_d' : make_scorer(f1_score, average=None, labels=[3])}
 
-model = xgb.XGBClassifier(learning_rate=0.2, min_child_weight=1,max_depth=8, reg_lambda = 2,objective='multi:softprob', eval_metric ='mlogloss', use_label_encoder = False, seed=1)
+
+model = xgb.XGBClassifier(learning_rate=0.01, min_child_weight=1,max_depth=7, reg_lambda = 2,objective='multi:softprob', eval_metric ='mlogloss', use_label_encoder = False, seed=1)
 
 #TO DO adjust this. make it not take forever. maybe run it on my gpu on my pc
-clf_rand = RandomizedSearchCV(estimator=model, n_iter=1, param_distributions=grid_param, scoring=scorer, cv= 3, refit='f1_d', n_jobs=-1, verbose=1)
-model = clf_rand.fit(X_train,y_train)
+#clf_rand = RandomizedSearchCV(estimator=model, n_iter=20, param_distributions=grid_param, scoring=scorer, cv= 5, refit='f1_d', n_jobs=2, verbose=1)
+#model = clf_rand.fit(X_train,y_train)
 
 #Save stuff
-filename = '../../models/xgboost_classifier.pkl'
-pickle.dump(model, open(filename, 'wb'))
-print(clf_rand.best_params_)
+#filename = '../../models/xgboost_classifier.pkl' #breaks here. finally found that out. **WILL DEBUG ASAP BUT I SLEEP NOW**
+#pickle.dump(model, open(filename, 'wb'))
+#print(clf_rand.best_params_)
 
 
 # Output attempted parameters and resulting metrics
-df = pd.DataFrame(clf_rand.cv_results)
-df = df.sort_values(by='rank_test_f1_d')
-df = df[df.columns.drop(list(df.filter(regex=r'(time)|(std)|(split)|(param_)|(rank)')))]
-df = df[['params', 'mean_test_f1_d', 'mean_test_recall_d', 'mean_test_accuracy', 'mean_test_recall_macro','mean_test_f1_macro']]
-df.rename(columns={"mean_test_f1_macro": "Overall F1-Score(Macro)", 
-	"mean_test_recall_macro": "Overall Recall(Macro)",
-	"mean_test_accuracy": "Overall Accuracy",
-	"mean_test_f1_d": "F1-Score on Deceased",
-	"mean_test_recall_d": "Recall on Deceased",
-	"params": "Hyperparameters"},inplace=True)
-df.to_csv('../../results/xgboost_tuning.csv',index=False)
-print("saved attempted parameters to csv")
-
+# df = pd.DataFrame(clf_rand.cv_results_)
+# df = df.sort_values(by='rank_test_f1_d')
+# df = df[df.columns.drop(list(df.filter(regex=r'(time)|(std)|(split)|(param_)|(rank)')))]
+# df = df[['params', 'mean_test_f1_d', 'mean_test_recall_d', 'mean_test_accuracy', 'mean_test_recall_macro','mean_test_f1_macro']]
+# df.rename(columns={"mean_test_f1_macro": "Overall F1-Score(Macro)", 
+# 	"mean_test_recall_macro": "Overall Recall(Macro)",
+# 	"mean_test_accuracy": "Overall Accuracy",
+# 	"mean_test_f1_d": "F1-Score on Deceased",
+# 	"mean_test_recall_d": "Recall on Deceased",
+# 	"params": "Hyperparameters"},inplace=True)
+# df.to_csv('../../results/xgboost_tuning.csv',index=False)
+# print("saved attempted parameters to csv")
+# print(clf_rand.best_params_)
 #Reformat everything below here
 #TODO: use smote to get better prediction on the minority class
 #(tentative) TODO: refactor again into nice neat functions
@@ -94,7 +99,7 @@ print("saved attempted parameters to csv")
 #scale_pos_weight should be positive when high class imbalance (like we have!)
 #seed = 1 for parameter tuning
 #learning_rate will shrink weights on model (can make model more robust, typically 0.01-0.2)
-#model.fit(X_train,y_train)
+model.fit(X_train,y_train)
 #print(model)
 
 #predict on test data
@@ -111,6 +116,21 @@ predictions_tr = [round(value) for value in y_pred_train]
 predictions_tr = list(map(labels_m.get,predictions_tr))
 y_train = list(map(labels_m.get,y_train))
 print(classification_report(y_train,predictions_tr))
+
+
+#Stuff for getting plot for overfitting
+#print(learns)
+#print(f1_te)
+#print(f1_tr)
+
+#plt.plot(learns, f1_te, label = "Validation")
+#plt.plot(learns, f1_tr, label = "Training")
+
+#plt.xlabel('learning_rate')
+#plt.ylabel('Macro f1 Score')
+#plt.title('XGBoost plot macro F1 Score vs learning rate')
+#plt.legend()
+#plt.show()
 
 
 #Tune parameters
