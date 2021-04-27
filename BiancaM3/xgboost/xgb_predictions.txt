@@ -1,4 +1,0 @@
-nonhospitalized
-hospitalized
-recovered
-deceased
